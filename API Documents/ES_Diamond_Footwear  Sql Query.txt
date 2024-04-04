@@ -1,0 +1,4 @@
+
+Create Table [ESUserMaster] ([UID] int Primary Key Identity(1,1) Not Null,[UserType] int Null, [UserName] Varchar(60) Null, [Mobile] Varchar(30) Null, [Email] Varchar(40) Null, [Password] Varchar(40) Null,[Role] Int Null,[Description] Varchar(605) Null, [DocAttach] int Null, [Base64] ntext, [Active] Int Null, [CreatedBy] Varchar(40) null, [CreatedOn] Datetime Null)
+
+Create Table [ESMaster1] ([Code] Int Primary Key Identity (1,1) Not Null, [Name] Varchar(50) Null, ParentGrp Int Null, MasterType Int Null, CreatedBy Varchar(50) Null, CreatedOn DateTime Null)
