@@ -156,7 +156,7 @@ namespace Diamond_Footwear_Services.Services
             List<GetUserMasterDetail> UList = new List<GetUserMasterDetail>();
             try
             {
-                string sql = "";
+                string sql = "" ;
                 if (UserId > 0)
                 {
                     sql = $"select A.[UID] as UserId, IsNull(A.[UserName], '') as Username, IsNull(A.[Mobile],'') as MobileNo, IsNull(A.[Email], '') as EmailId, IsNull(A.[Password], '') as PWD, IsNull(A.[Role], 0) as RoleId,IsNull(B.[Name], '') as RoleName, IsNull(A.[Description], '') as [Desc], IsNull([DocAttach], '') as Doc1, IsNull([Base64], '') as [Image], IsNull(Active, 0) as Active, CONVERT(VARCHAR(10), A.CreatedOn, 105) as CreatedOn From ESUserMaster A Left Join ESMaster1 B On A.[Role] = B.[Code] And B.[MasterType] = 1 Where A.[UserType] = {UserType} And A.[UID] = {UserId} Order By A.[CreatedOn] ";
