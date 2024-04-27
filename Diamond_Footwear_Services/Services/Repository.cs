@@ -2,12 +2,15 @@
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.VisualBasic;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -28,37 +31,148 @@ namespace Diamond_Footwear_Services.Services
 #pragma warning restore CS8601 // Possible null reference assignment.
         }
 
+        private string GenerateToken(string userName)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Name, userName)
+                }),
+                Expires = DateTime.UtcNow.AddDays(1),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
+
+        public async Task<dynamic> ValidateUsers(ValidateUser obj)
+        {
+            ValidateUserDet UserDT = new ValidateUserDet(); int Status = 0; string StatusStr = ""; string token = null;
+            try
+            {
+                ValidateUser User1 = new ValidateUser(); string sql  = ""; 
+                User1.UserName = obj.UserName; User1.Password = obj.Password;
+
+                sql = $"SELECT TOP 1 [UID] as [UserId],ISNULL([UserName],'') as [Name], ISNULL([Base64],'') as [Images], ISNULL([UserType],0) as [UserType], ISNULL([Active],0) as [Active], ISNULL([Admin], 0) as [Admin] FROM ESUSERMASTER WHERE ([EMAIL] = '{User1.UserName}' OR MOBILE = '{User1.UserName}') AND [PASSWORD] = '{User1.Password}' And [IsDeleted] <> 1 ";
+                var DT1 = await _db.ValidateUserDets.FromSqlRaw(sql).ToListAsync();
+
+                if (DT1.Count == 0)
+                {
+                    sql = $"SELECT Top 1  0 as Status, '' as Msg, * FROM ESUSERMASTER WHERE ([EMAIL] = '{User1.UserName}' OR [MOBILE] = '{User1.UserName}') And [IsDeleted] <> 1";
+                    var DT2 = await _db.Responses.FromSqlRaw(sql).FirstOrDefaultAsync();
+                    if (DT2 != null)
+                    {
+                        sql = $"SELECT Top 1 0 as Status, '' as Msg, * FROM ESUSERMASTER WHERE ([EMAIL] = '{User1.UserName}' OR [MOBILE] = '{User1.UserName}') AND [PASSWORD] = '{User1.Password}' And [IsDeleted] <> 1";
+                        var DT3 = await _db.Responses.FromSqlRaw(sql).FirstOrDefaultAsync();
+                        if (DT3 == null)
+                        {
+                            Status = 0; StatusStr = "Wrong password. Try again or click ‘Forgot password’ to reset it. !";
+                        }
+                    }
+                    else
+                    {
+                        Status = 0; StatusStr = "Couldn't find your username and password. !";
+                    }
+                }
+                else
+                {
+                    if (DT1[0].Active == 1)
+                    {
+                        token = GenerateToken(User1.UserName); // Generate a JWT token
+                        Status = 1; StatusStr = "Valid";
+                    }
+                    else
+                    {
+                        Status = 0; StatusStr = "Your user is currently inactive. !";
+                    }
+
+                    if (DT1[0].Active == 1)
+                    {
+                        UserDT.UserId = DT1[0].UserId;
+                        UserDT.Name = DT1[0].Name;
+                        UserDT.Images = DT1[0].Images;
+                        UserDT.UserType = DT1[0].UserType;
+                        UserDT.Active = DT1[0].Active;
+                        UserDT.Admin = DT1[0].Admin;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new { Status = 0, Msg = ex.Message.ToString(), Data = UserDT, Token = token };
+            }
+            return new { Status = Status, Msg = StatusStr, Data =  UserDT, Token = token };
+        }
+
+        //public async Task<dynamic> DeleteMaster(int TranType, int MasterType, int Id)
+        //{
+        //    int Status = 0; string? StatusStr = "";
+        //    try
+        //    {
+        //        SqlParameter param0 = new SqlParameter("@p0", TranType);
+        //        SqlParameter param1 = new SqlParameter("@p1", MasterType);
+        //        SqlParameter param2 = new SqlParameter("@p2", Id);
+
+
+        //        if (Id > 0 && TranType > 0)
+        //        {
+        //            var DT1 = await _db.Responses.FromSqlRaw("EXEC [Sp_DeleteMaster] @p0, @p1, @p2", param0, param1, param2).ToListAsync();
+
+        //            Status = DT1[0].Status;
+        //            StatusStr = DT1[0].Msg;
+
+        //            if (DT1[0].Status == 0)
+        //            {
+        //                return new { Status = 0, Msg = "Master Not Exists. !!!" };
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new { Status = 0, Msg = ex.Message.ToString() };
+        //    }
+        //    return new { Status = Status, Msg = StatusStr };
+        //}
+
+
         public async Task<dynamic> DeleteMaster(int TranType, int MasterType, int Id)
         {
             try
             {
                 string sql = "";
-                if (Id > 0) { 
+                if (Id > 0)
+                {
 
                     if (TranType == 1)
-                    {   if (! ValidRoleMasterIfExistsInUsers(Id))
+                    {
+                        if (!ValidRoleMasterIfExistsInUsers(Id))
                         {
                             sql = $"Delete From ESMASTER1 Where MasterType = {MasterType} And Code = {Id}";
                         }
                         else
                         {
-                            return new { Status = 0, Msg = "This Role Name Tag In Some User Master !!!" };
+                            return new { Status = 0, Msg = "This Role Name Tag In Some Users. !" };
                         }
                     }
                     else if (TranType == 2)
                     {
-                        sql = $"Delete From ESUserMaster Where UserType = {MasterType} And Code = {Id}";
+                        sql = $"Delete From ESUserMaster Where UserType = {MasterType} And UID = {Id}";
                     }
                     else if (TranType == 3)
                     {
                         sql = $"Delete From ESMASTER1 Where MasterType = {MasterType} And Code = {Id}";
                     }
-                } 
+                }
                 var Result = await _db.Database.ExecuteSqlRawAsync(sql);
 
-                if (Result == 0) return new { Status = 0, Msg = "Master Not Exists ...." };
+                if (Result == 0) return new { Status = 0, Msg = "Master Not Exists .!" };
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return new { Status = 0, Msg = ex.Message.ToString() };
             }
@@ -73,11 +187,11 @@ namespace Diamond_Footwear_Services.Services
                 string sql = "";
                 if (RoleId == 0)
                 {
-                    sql = $"Select Code as RoleId,[Name],CONVERT(VARCHAR(10), CreatedOn, 105) as CreatedOn From ESMaster1 Where MasterType = {MasterType} Order By Name";
+                    sql = $"Select Code as RoleId,[Name],CONVERT(VARCHAR(10), CreatedOn, 105) as CreatedOn From ESMaster1 Where MasterType = {MasterType} And [IsDeleted] <> 1 Order By Name";
                 }
                 else
                 {
-                    sql = $"Select Code as RoleId,[Name],CONVERT(VARCHAR(10), CreatedOn, 105) From ESMaster1 Where MasterType = {MasterType} And Code = {RoleId} Order By Name";
+                    sql = $"Select Code as RoleId,[Name],CONVERT(VARCHAR(10), CreatedOn, 105) From ESMaster1 Where MasterType = {MasterType} And Code = {RoleId} And [IsDeleted] <> 1 Order By Name";
                 }
 
                 RList = await _db.GetUserRoleMasters.FromSqlRaw(sql).ToListAsync();
@@ -159,11 +273,11 @@ namespace Diamond_Footwear_Services.Services
                 string sql = "" ;
                 if (UserId > 0)
                 {
-                    sql = $"select A.[UID] as UserId, IsNull(A.[UserName], '') as Username, IsNull(A.[Mobile],'') as MobileNo, IsNull(A.[Email], '') as EmailId, IsNull(A.[Password], '') as PWD, IsNull(A.[Role], 0) as RoleId,IsNull(B.[Name], '') as RoleName, IsNull(A.[Description], '') as [Desc], IsNull([DocAttach], '') as Doc1, IsNull([Base64], '') as [Image], IsNull(Active, 0) as Active, CONVERT(VARCHAR(10), A.CreatedOn, 105) as CreatedOn From ESUserMaster A Left Join ESMaster1 B On A.[Role] = B.[Code] And B.[MasterType] = 1 Where A.[UserType] = {UserType} And A.[UID] = {UserId} Order By A.[CreatedOn] ";
+                    sql = $"select A.[UID] as UserId, IsNull(A.[UserName], '') as Username, IsNull(A.[Mobile],'') as MobileNo, IsNull(A.[Email], '') as EmailId, IsNull(A.[Password], '') as PWD, IsNull(A.[Role], 0) as RoleId,IsNull(B.[Name], '') as RoleName, IsNull(A.[Description], '') as [Desc], IsNull([DocAttach], '') as Doc1, IsNull([Base64], '') as [Image], IsNull(Active, 0) as Active, CONVERT(VARCHAR(10), A.CreatedOn, 105) as CreatedOn From ESUserMaster A Left Join ESMaster1 B On A.[Role] = B.[Code] And B.[MasterType] = 1 Where A.[UserType] = {UserType} And A.[UID] = {UserId} And A.[IsDeleted] <> 1 Order By A.[CreatedOn] ";
                 }
                 else
                 {
-                    sql = $"select A.[UID] as UserId, IsNull(A.[UserName], '') as Username, IsNull(A.[Mobile],'') as MobileNo, IsNull(A.[Email], '') as EmailId, IsNull(A.[Password], '') as PWD, IsNull(A.[Role], 0) as RoleId,IsNull(B.[Name], '') as RoleName, IsNull(A.[Description], '') as [Desc], IsNull([DocAttach], '') as Doc1, IsNull([Base64], '') as [Image], IsNull(Active, 0) as Active, CONVERT(VARCHAR(10), A.CreatedOn, 105) as CreatedOn From ESUserMaster A Left Join ESMaster1 B On A.[Role] = B.[Code] And B.[MasterType] = 1 Where A.[UserType] = {UserType} Order By A.[CreatedOn] ";
+                    sql = $"select A.[UID] as UserId, IsNull(A.[UserName], '') as Username, IsNull(A.[Mobile],'') as MobileNo, IsNull(A.[Email], '') as EmailId, IsNull(A.[Password], '') as PWD, IsNull(A.[Role], 0) as RoleId,IsNull(B.[Name], '') as RoleName, IsNull(A.[Description], '') as [Desc], IsNull([DocAttach], '') as Doc1, IsNull([Base64], '') as [Image], IsNull(Active, 0) as Active, CONVERT(VARCHAR(10), A.CreatedOn, 105) as CreatedOn From ESUserMaster A Left Join ESMaster1 B On A.[Role] = B.[Code] And B.[MasterType] = 1 Where A.[UserType] = {UserType} And A.[IsDeleted] <> 1 Order By A.[CreatedOn] ";
                 }
                 UList = await _db.GetUserMasterDetails.FromSqlRaw(sql).ToListAsync();
 
@@ -181,7 +295,7 @@ namespace Diamond_Footwear_Services.Services
         {
             try
             {
-                string sql = $"select Top 1 IsNull([Role],0) as Result, '' as Msg, 0 as Status From ESUserMaster Where [Role] = {id}";
+                string sql = $"select Top 1 IsNull([Role],0) as Result, '' as Msg, 0 as Status From ESUserMaster Where [Role] = {id} And IsDeleted <> 1";
                 var Result = _db.Responses.FromSqlRaw(sql).FirstOrDefault();
 
                 if (Result != null) 
@@ -193,11 +307,6 @@ namespace Diamond_Footwear_Services.Services
             {
                 return false;
             }
-        }
-        
-        public Task<dynamic> ValidateUsers(string username, string password)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task<dynamic> GetOrderReceivedsDetails(int Series, int Party, string? StartDate, string? EndDate)
@@ -211,7 +320,7 @@ namespace Diamond_Footwear_Services.Services
 
                 if (busyComp.Length > 0)
                 {
-                    sql = $"Select Distinct A.[Code] as VchCode,IsNull(A.[Series],0) as SCode,IsNull(B.[Name],'') as SName,CONVERT(VARCHAR(10), A.[SoDate], 105) as VchDate,IsNull(A.[Prefix], '') as VchNo,IsNull(A.[AccCode], 0) as AccCode, IsNull(C.[Name], '') as AccName,IsNull(A.[MatCode], 0) as MCCode, IsNull(D.[Name], '') as MCName, IsNull([TotalQty],0) as TotQty, IsNull([TotalAltQty], 0) as TotAltQty, IsNull([TotalNetAmount],0) as TotAmt  From SoHeader A Left Join VchSeries B On A.Series = B.Code And B.TranType = 12 inner Join {busyComp}.dbo.Master1 C On A.AccCode = C.Code And C.MasterType = 2 Left Join {busyComp}.dbo.Master1 D On A.MatCode = D.Code And D.MasterType = 11 Where (A.Flag Is Null Or A.Flag = 0)";
+                    sql = $"Select Distinct A.[Code] as VchCode,IsNull(A.[Series],0) as SCode,IsNull(B.[Name],'') as SName,CONVERT(VARCHAR(10), A.[SoDate], 105) as VchDate,IsNull(A.[Prefix], '') as VchNo,IsNull(A.[AccCode], 0) as AccCode, IsNull(C.[Name], '') as AccName,IsNull(A.[MatCode], 0) as MCCode, IsNull(D.[Name], '') as MCName, IsNull([TotalQty],0) as TotQty, IsNull([TotalAltQty], 0) as TotAltQty, IsNull([TotalNetAmount],0) as TotAmt  From SoHeader A Left Join VchSeries B On A.Series = B.Code And B.TranType = 12 inner Join {busyComp}.dbo.Master1 C On A.AccCode = C.Code Left Join {busyComp}.dbo.Master1 D On A.MatCode = D.Code Where (A.Flag Is Null Or A.Flag = 0)";
                     if (Series > 0) sql += $" AND A.Series = {Series}";
                     if (Party > 0) sql += $" AND A.AccCode = {Party}";
                     if (StartDate?.Length > 0 && EndDate?.Length > 0) sql += $" AND A.SoDate >= '{formattedStartDate}' And A.SoDate <= '{formattedEndDate}' ";
@@ -232,7 +341,7 @@ namespace Diamond_Footwear_Services.Services
             List<GetOrderReceivedItemDetail> RList1 = new  List<GetOrderReceivedItemDetail>();
             try
             {
-                string sql = $"Select IsNull([Item], 0) as ItemCode, B.[Name] as ItemName, IsNull([Para1], '') as Para1, IsNull([Para2], 0) as Para2, IsNull([Qty], 0) as Qty, IsNull([AltQty], 0) as AltQty, 0 as ClQty, IsNull(C.[Name], '') as Unit, IsNull(D.[Name], '') AltUnit, IsNull([Price], 0) as Price, IsNull([MRP], 0) as MRP, IsNull([Amount], 0) as Amount, IsNull(A.[IsCancel],0) as Status From SoDetails A Inner Join BusyComp0020_db12023.dbo.Master1 B On A.item = B.Code And B.MasterType = 6 Left Join BusyComp0020_db12023.dbo.Master1 C On A.Unit = C.Code And C.MasterType = 8 \r\nLeft Join BusyComp0020_db12023.dbo.Master1 D On A.AltUnit = D.Code And D.MasterType = 8 Where A.Code = {VchCode} Order By A.SrNo";
+                string sql = $"Select IsNull([Item], 0) as ItemCode, B.[Name] as ItemName, IsNull([Para1], '') as Para1, IsNull([Para2], 0) as Para2, IsNull([Qty], 0) as Qty, IsNull([AltQty], 0) as AltQty, 0 as ClQty, IsNull(C.[Name], '') as Unit, IsNull(D.[Name], '') AltUnit, IsNull([Price], 0) as Price, IsNull([MRP], 0) as MRP, IsNull([Amount], 0) as Amount, IsNull(A.[IsCancel],0) as Status From SoDetails A Left Join BusyComp0020_db12023.dbo.Master1 B On A.item = B.Code Left Join BusyComp0020_db12023.dbo.Master1 C On A.Unit = C.Code Left Join BusyComp0020_db12023.dbo.Master1 D On A.AltUnit = D.Code Where A.Code = {VchCode} Order By A.SrNo";
                 RList1 = await _db.GetOrderReceivedItemDetails.FromSqlRaw(sql).ToListAsync();
 
                 if (RList1 == null || RList1.Count == 0) return new { Status = 0, Msg = "Data Not Found ....", Data = RList1 };
@@ -263,5 +372,6 @@ namespace Diamond_Footwear_Services.Services
             }
             return new { Status = 1, Msg = "Your request has been successfully approved. Thank you for your cooperation!" };
         }
+
     }
 }

@@ -6,6 +6,22 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Diamond_Footwear_Services.DBContext
 {
+    public class ValidateUser
+    {
+        public string UserName { get; set; }
+        public string Password { get; set; }
+    }
+
+    public partial class ValidateUserDet
+    {
+        public int UserId { get; set; }
+        public string? Name { get; set; }
+        public string? Images { get; set; }
+        public int UserType { get; set; }
+        public int Active {  get; set; }
+        public int Admin { get; set; }
+    }
+
     public class UserDetail
     {
         public int UserId { get; set; }

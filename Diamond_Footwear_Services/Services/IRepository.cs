@@ -9,14 +9,15 @@ namespace Diamond_Footwear_Services.Services
 {
     public interface IRepository
     {
+        public Task<dynamic> ValidateUsers(ValidateUser obj);
         public Task<dynamic> SaveUserRoleMaster(SaveUserRoleMaster Obj);
         public Task<dynamic> GetUserRoleMaster(int MasterType, int RoleId);
-        public Task<dynamic> ValidateUsers(string username, string password);
         public Task<dynamic> DeleteMaster(int TranType, int MasterType, int Id);
         public Task<dynamic> SaveUserMastDetails(SaveUsersMastDetail obj);
         public Task<dynamic> GetUserMastDetails(int UserType, int UserId);
         public Task<dynamic> GetOrderReceivedsDetails(int Series, int Party, string? StartDate, string? EndDate);
         public Task<dynamic> GetOrderReceivedItemsDetails(int VchCode);
         public Task<dynamic> UpdateOrderReceivedApproval(UpdateOrderReceivedApproval obj);
+
     }
 }

@@ -1,5 +1,6 @@
 using Diamond_Footwear_Services.DBContext;
 using Diamond_Footwear_Services.Services;
+using Diamond_Footwear_Web.Login;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -18,31 +19,32 @@ builder.Services.AddDbContext<DiamondFootwearWebContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("Constr")));
 
 
-//string connectionString = "Server=YourServerName;Database=YourDatabaseName;User Id=YourUsername;Password=YourPassword;";
-string connectionString = "Server = ESLAPI\\SQL2024 ; Database = Diamond_Footwear_Web; User Id = SA; Password = 1234; trusted_Connection = False; Encrypt = false; Integrated Security = false; MultipleActiveResultSets=true";
+////string connectionString = "Server=YourServerName;Database=YourDatabaseName;User Id=YourUsername;Password=YourPassword;";
+//string connectionString = "Server = ESLAPI\\SQL2024 ; Database = Diamond_Footwear_Web; User Id = SA; Password = 1234; trusted_Connection = False; Encrypt = false; Integrated Security = false; MultipleActiveResultSets=true";
 
-    using (SqlConnection connection = new SqlConnection(connectionString))
-    {
-        try
-        {
-            // Connection Open
-            connection.Open();
-            Console.WriteLine("Connection Established Successfully!");
+//    using (SqlConnection connection = new SqlConnection(connectionString))
+//    {
+//        try
+//        {
+//            // Connection Open
+//            connection.Open();
+//            Console.WriteLine("Connection Established Successfully!");
 
-            // Perform your database operations here
+//            // Perform your database operations here
 
-            // Connection Close
-            connection.Close();
-            Console.WriteLine("Connection Closed.");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Error: " + ex.Message);
-        }
-    }
+//            // Connection Close
+//            connection.Close();
+//            Console.WriteLine("Connection Closed.");
+//        }
+//        catch (Exception ex)
+//        {
+//            Console.WriteLine("Error: " + ex.Message);
+//        }
+//    }
 
 
 builder.Services.AddTransient<IRepository, Repository>();
+builder.Services.AddSingleton<TokenService>();
 
 builder.Services.AddCors(opt =>
 {

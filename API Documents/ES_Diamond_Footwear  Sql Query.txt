@@ -1,4 +1,12 @@
 
-Create Table [ESUserMaster] ([UID] int Primary Key Identity(1,1) Not Null,[UserType] int Null, [UserName] Varchar(60) Null, [Mobile] Varchar(30) Null, [Email] Varchar(40) Null, [Password] Varchar(40) Null,[Role] Int Null,[Description] Varchar(605) Null, [DocAttach] int Null, [Base64] ntext, [Active] Int Null, [CreatedBy] Varchar(40) null, [CreatedOn] Datetime Null)
+-- case-sensitive exists column add on
+ALTER TABLE ESUSERMASTER ALTER COLUMN [Password] VARCHAR(30) COLLATE Latin1_General_CS_AS NOT NULL;
 
-Create Table [ESMaster1] ([Code] Int Primary Key Identity (1,1) Not Null, [Name] Varchar(50) Null, ParentGrp Int Null, MasterType Int Null, CreatedBy Varchar(50) Null, CreatedOn DateTime Null)
+-- Create table
+Create Table [ESUserMaster] ([UID] int Primary Key Identity(1,1) Not Null,[UserType] int Null, [UserName] Varchar(60) Null, [Mobile] Varchar(30) Null, [Email] Varchar(40) Null, [Password] Varchar(40) Null,[Role] Int Null,[Description] Varchar(605) Null, [DocAttach] int Null, [Base64] ntext, [Active] Int Null, [IsDeleted] Int Default 0, [Admin] Int Null, [CreatedBy] Varchar(40) null, [CreatedOn] Datetime Null)
+
+Create Table [ESMaster1] ([Code] Int Primary Key Identity (1,1) Not Null, [Name] Varchar(50) Null, ParentGrp Int Null, MasterType Int Null, CreatedBy Varchar(50) Null,[IsDeleted] Int Default 0, CreatedOn DateTime Null)
+
+Create Table [ESOrderTask] ([Code] INT PRIMARY KEY IDENTITY(1,1), VchCode Int,[VchDate] DateTime Null,[VchNo] Varchar(40) Null,[MasterCode1] Int Null,[MasterCode2] Int NUll,[Param1] Varchar(30) Null,[Param2] Varchar(30) Null,[Unit] Int Null,[Value1] Float Null,[Value2] Float Null,[Value3] Float Null,[Value4] Float Null,[Value5] Float Null,[Value6] Float Null,[Person] Varchar(50) NUll,[Status] Int Null)
+
+CREATE TABLE [ESOrderTaskDetails] (Code INT Null, [VchCode] int Null, [VchDate] Datetime Null, [VchNo] Varchar(40) Null, [AccCode] Int Null,[PoNo] Varchar(30) Null,[TaskId] Int Null,[TaskDesc] Varchar(30) Null,[Date] DateTime Null,[ItemCode] Int Null,[Param1] Varchar(30) Null,[Param2] Varchar(30) Null,[Qty] Float Null,[AltQty] Float Null,[Remarks] Varchar(200) Null,[Status] Int Null,[CompletedOn] DateTime Null,[DoneBy] Varchar(50) NUll)

@@ -111,5 +111,6 @@ namespace Diamond_Footwear_Services.DBContext
         {
             return type.IsGenericType && type.GetGenericTypeDefinition().Equals(typeof(Nullable<>));
         }
+
     }
 }

@@ -15,6 +15,7 @@ public partial class DiamondFootwearWebContext : DbContext
     }
 
     public virtual DbSet<Response> Responses { get; set; }
+    public virtual DbSet<ValidateUserDet> ValidateUserDets { get; set; }
     public virtual DbSet<Status> Results { get; set; }
     public virtual DbSet<SaveUserRoleMaster> SaveUserRoleMasters { get; set; }
     public virtual DbSet<GetUserRoleMaster> GetUserRoleMasters { get; set; }
@@ -66,7 +67,7 @@ public partial class DiamondFootwearWebContext : DbContext
         });
 
         OnModelCreatingPartial(modelBuilder);*/
-
+        modelBuilder.Entity<ValidateUserDet>().HasNoKey();
         modelBuilder.Entity<Response>().HasNoKey();
         modelBuilder.Entity<Status>().HasNoKey();
         modelBuilder.Entity<SaveUserRoleMaster>().HasNoKey();
