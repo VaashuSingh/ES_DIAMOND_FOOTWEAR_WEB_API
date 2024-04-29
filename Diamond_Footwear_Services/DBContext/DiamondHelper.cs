@@ -26,8 +26,8 @@ namespace Diamond_Footwear_Services.DBContext
                     xmlDoc.Load(xmlStream);
 
                     // Optionally, include XML declaration
-                    XmlDeclaration xmlDeclaration = xmlDoc.CreateXmlDeclaration("1.0", "utf-8", null);
-                    xmlDoc.InsertBefore(xmlDeclaration, xmlDoc.DocumentElement);
+                    //XmlDeclaration xmlDeclaration = xmlDoc.CreateXmlDeclaration("1.0", "utf-8", null);
+                    //xmlDoc.InsertBefore(xmlDeclaration, xmlDoc.DocumentElement);
 
                     return xmlDoc.InnerXml;
                 }
@@ -36,11 +36,27 @@ namespace Diamond_Footwear_Services.DBContext
             {
                 // Handle serialization exceptions
                 Console.WriteLine($"Error in CreateXml: {ex.Message}");
-                #pragma warning disable CS8603 // Possible null reference return.
+#pragma warning disable CS8603 // Possible null reference return.
                 return null;
-                #pragma warning restore CS8603 // Possible null reference return.
+#pragma warning restore CS8603 // Possible null reference return.
             }
         }
+
+        //public static string CreateXml(Object YourClassObject)
+        //{
+        //    XmlDocument xmlDoc = new XmlDocument();   //Represents an XML document, 
+        //                                              // Initializes a new instance of the XmlDocument class.          
+        //    XmlSerializer xmlSerializer = new XmlSerializer(YourClassObject.GetType());
+        //    // Creates a stream whose backing store is memory. 
+        //    using (MemoryStream xmlStream = new MemoryStream())
+        //    {
+        //        xmlSerializer.Serialize(xmlStream, YourClassObject);
+        //        xmlStream.Position = 0;
+        //        //Loads the XML document from the specified string.
+        //        xmlDoc.Load(xmlStream);
+        //        return xmlDoc.InnerXml;
+        //    }
+        //}
 
         // Function to format date string from "dd-MM-yyyy" to "dd-MMM-yyyy"
         public static string FormatDate(string dateString)

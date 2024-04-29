@@ -87,5 +87,11 @@ namespace Diamond_Footwear_Web.Controllers
         {
             return Ok(await _service.UpdateOrderReceivedApproval(obj));
         }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveOrderAcceptTask(SaveOrderAcceptTaskHead obj)
+        {
+            return Ok(await _service.SaveOrderAcceptTasks(obj));
+        }
     }
 }

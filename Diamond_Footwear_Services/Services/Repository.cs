@@ -341,7 +341,8 @@ namespace Diamond_Footwear_Services.Services
             List<GetOrderReceivedItemDetail> RList1 = new  List<GetOrderReceivedItemDetail>();
             try
             {
-                string sql = $"Select IsNull([Item], 0) as ItemCode, B.[Name] as ItemName, IsNull([Para1], '') as Para1, IsNull([Para2], 0) as Para2, IsNull([Qty], 0) as Qty, IsNull([AltQty], 0) as AltQty, 0 as ClQty, IsNull(C.[Name], '') as Unit, IsNull(D.[Name], '') AltUnit, IsNull([Price], 0) as Price, IsNull([MRP], 0) as MRP, IsNull([Amount], 0) as Amount, IsNull(A.[IsCancel],0) as Status From SoDetails A Left Join BusyComp0020_db12023.dbo.Master1 B On A.item = B.Code Left Join BusyComp0020_db12023.dbo.Master1 C On A.Unit = C.Code Left Join BusyComp0020_db12023.dbo.Master1 D On A.AltUnit = D.Code Where A.Code = {VchCode} Order By A.SrNo";
+                //string sql = $"Select A.[Code] as VchCode, IsNull([Item], 0) as ItemCode, B.[Name] as ItemName, IsNull([Para1], '') as Color, IsNull([Para2], 0) as Size, IsNull([Qty], 0) as Qty, IsNull([AltQty], 0) as AltQty,CONVERT(FLOAT, 0) as ClQty, IsNull(C.[Name], '') as Unit, IsNull(D.[Name], '') AltUnit, IsNull([Price], 0) as Price, IsNull([MRP], 0) as MRP, IsNull([Amount], 0) as Amount, IsNull(A.[IsCancel],0) as Status From SoDetails A Left Join BusyComp0020_db12023.dbo.Master1 B On A.item = B.Code Left Join BusyComp0020_db12023.dbo.Master1 C On A.Unit = C.Code Left Join BusyComp0020_db12023.dbo.Master1 D On A.AltUnit = D.Code Where A.Code = {VchCode} Order By A.[SrNo],A.[Code]";
+                string sql = $"Select A.[Code] as VchCode, CONVERT(VARCHAR, A.[SODate], 105) as [VchDate], IsNull(A.[Prefix], '') as VchNo, IsNull(A.[CustPo], '') as PoNo, IsNull(A.[AccCode],0) as AccCode,  IsNull(B.[Item], 0) as ItemCode, C.[Name] as ItemName,IsNull(B.[Para1], '') as Color, IsNull(B.[Para2], 0) as Size, IsNull(B.[Qty], 0) as Qty, IsNull(B.[AltQty], 0) as AltQty, CONVERT(FLOAT, 0) as ClQty, IsNull(B.[Unit], 0) as UCode, IsNull(D.[Name], '') as Unit, IsNull(E.[Name], '') AltUnit, IsNull(B.[Price], 0) as Price,IsNull(B.[MRP], 0) as MRP, IsNull(B.[Amount], 0) as Amount, 0 as [Status] From SoHeader A Inner Join SoDetails B On A.Code = B.Code Left Join BusyComp0020_db12023.dbo.Master1 C On B.item = C.Code Left Join BusyComp0020_db12023.dbo.Master1 D On B.Unit = D.Code Left Join BusyComp0020_db12023.dbo.Master1 E On B.AltUnit = E.Code Where A.Code = {VchCode} Group By A.[Code], A.[SODate], A.[Prefix], A.[CustPo], A.[AccCode], B.[Item], C.[Name],B.[Para1], B.[Para2], B.[Qty], B.[AltQty], B.[Unit], D.[Name], E.[Name], B.[Price],B.[MRP], B.[Amount], B.[SrNo] ";
                 RList1 = await _db.GetOrderReceivedItemDetails.FromSqlRaw(sql).ToListAsync();
 
                 if (RList1 == null || RList1.Count == 0) return new { Status = 0, Msg = "Data Not Found ....", Data = RList1 };
@@ -373,5 +374,27 @@ namespace Diamond_Footwear_Services.Services
             return new { Status = 1, Msg = "Your request has been successfully approved. Thank you for your cooperation!" };
         }
 
+        public async Task<dynamic> SaveOrderAcceptTasks(SaveOrderAcceptTaskHead obj)
+        {
+            int Status = 0; string StatusStr  = string.Empty;
+            try
+            {
+#pragma warning disable CS8604 // Possible null reference argument.
+                string TaskXml = DiamondHelper.CreateXml(obj.OrderAcceptTask);
+#pragma warning restore CS8604 // Possible null reference argument.
+
+                SqlParameter param0 = new SqlParameter("@p0", TaskXml.ToString());
+
+                var TD1 = await _db.Responses.FromSqlRaw("EXEC SP_SaveOrderAcceptTask @p0", param0).ToListAsync();
+
+                Status = TD1[0].Status;
+                StatusStr = TD1[0].Msg;
+            }
+            catch (Exception ex)
+            {
+                return new { Status = 0, Msg = ex.Message.ToString() };
+            }
+            return new { Status = Status, Msg = StatusStr };
+        }
     }
 }

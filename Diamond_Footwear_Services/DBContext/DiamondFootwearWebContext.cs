@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Xml.Linq;
 using Azure;
 //using Microsoft.AspNetCore.Identity;
 //using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -24,6 +25,8 @@ public partial class DiamondFootwearWebContext : DbContext
     public virtual DbSet<GetOrderReceivedDetail> GetOrderReceivedDetails { get; set; }
     public virtual DbSet<GetOrderReceivedItemDetail> GetOrderReceivedItemDetails { get; set; }
     public virtual DbSet<UpdateOrderReceivedApproval>UpdateOrderReceivedApprovals { get; set; }
+    public virtual DbSet<SaveOrderAcceptTaskHead>SaveOrderAcceptTaskHeads { get; set; }
+
     //public virtual DbSet<UserMaster> UserMasters { get; set; }
 
     //public virtual DbSet<UsersValidator> UsersValidate { get; set; }
@@ -77,6 +80,7 @@ public partial class DiamondFootwearWebContext : DbContext
         modelBuilder.Entity<GetOrderReceivedDetail>().HasNoKey();
         modelBuilder.Entity<GetOrderReceivedItemDetail>().HasNoKey();
         modelBuilder.Entity<UpdateOrderReceivedApproval>().HasNoKey();
+        modelBuilder.Entity<SaveOrderAcceptTaskHead>().HasNoKey();
 
         //modelBuilder.Entity<UsersValidator>(entity =>
         //{
