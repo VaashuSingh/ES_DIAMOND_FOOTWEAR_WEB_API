@@ -17,8 +17,10 @@ namespace Diamond_Footwear_Services.Services
         public Task<dynamic> GetUserMastDetails(int UserType, int UserId);
         public Task<dynamic> GetOrderReceivedsDetails(int Series, int Party, string? StartDate, string? EndDate);
         public Task<dynamic> GetOrderReceivedItemsDetails(int VchCode);
-        public Task<dynamic> UpdateOrderReceivedApproval(UpdateOrderReceivedApproval obj);
+        public Task<dynamic> UpdateOrderTaskApproval(SaveOrderTaskApproval obj);
         public Task<dynamic> SaveOrderAcceptTasks(SaveOrderAcceptTaskHead obj);
+        public Task<dynamic> GetTaskApprovelVchDetails(int TaskType);
+        public Task<dynamic> GetOrderApprovelItemHoldDetails(int TaskType, int TaskCode, int VchCode, int ItemCode);
 
     }
 }

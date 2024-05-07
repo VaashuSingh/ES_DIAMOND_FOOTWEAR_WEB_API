@@ -82,16 +82,28 @@ namespace Diamond_Footwear_Web.Controllers
             return Ok(await _service.GetOrderReceivedItemsDetails(VchCode));
         }
 
-        [HttpPut]
-        public async Task<IActionResult>UpdateOrderReceivedApprovals(UpdateOrderReceivedApproval obj)
-        {
-            return Ok(await _service.UpdateOrderReceivedApproval(obj));
-        }
-
         [HttpPost]
         public async Task<IActionResult> SaveOrderAcceptTask(SaveOrderAcceptTaskHead obj)
         {
             return Ok(await _service.SaveOrderAcceptTasks(obj));
+        }
+
+        [HttpGet("{TaskType:int}")]
+        public async Task<IActionResult> GetTaskApprovelVch(int TaskType)
+        {
+            return Ok(await _service.GetTaskApprovelVchDetails(TaskType));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateOrderTaskApproval(SaveOrderTaskApproval obj)
+        {
+            return Ok(await _service.UpdateOrderTaskApproval(obj));
+        }
+
+        [HttpGet("{TaskType}/{TaskCode}/{VchCode}/{ItemCode}")]
+        public async Task<IActionResult> GetOrderApprovelItemsHoldDetails(int TaskType, int TaskCode, int VchCode, int ItemCode)
+        {
+            return Ok(await _service.GetOrderApprovelItemHoldDetails(TaskType, TaskCode, VchCode, ItemCode));
         }
     }
 }

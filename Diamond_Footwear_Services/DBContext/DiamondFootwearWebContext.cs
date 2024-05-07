@@ -17,19 +17,18 @@ public partial class DiamondFootwearWebContext : DbContext
 
     public virtual DbSet<Response> Responses { get; set; }
     public virtual DbSet<ValidateUserDet> ValidateUserDets { get; set; }
-    public virtual DbSet<Status> Results { get; set; }
+    public virtual DbSet<Results> Resultss { get; set; }
     public virtual DbSet<SaveUserRoleMaster> SaveUserRoleMasters { get; set; }
     public virtual DbSet<GetUserRoleMaster> GetUserRoleMasters { get; set; }
     public virtual DbSet<SaveUsersMastDetail> SaveUserMastDetails { get; set; }
     public virtual DbSet<GetUserMasterDetail> GetUserMasterDetails { get; set; }
     public virtual DbSet<GetOrderReceivedDetail> GetOrderReceivedDetails { get; set; }
     public virtual DbSet<GetOrderReceivedItemDetail> GetOrderReceivedItemDetails { get; set; }
-    public virtual DbSet<UpdateOrderReceivedApproval>UpdateOrderReceivedApprovals { get; set; }
     public virtual DbSet<SaveOrderAcceptTaskHead>SaveOrderAcceptTaskHeads { get; set; }
+    public virtual DbSet<GetOrderApprovelItems> GetOrderApprovelVches { get; set; }
+    public virtual DbSet<SaveOrderTaskApproval> SaveOrderTaskApprovals { get; set; }
+    public virtual DbSet<GetApprovelHoldDet> GetApprovelHoldDets { get; set; }
 
-    //public virtual DbSet<UserMaster> UserMasters { get; set; }
-
-    //public virtual DbSet<UsersValidator> UsersValidate { get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Server = 103.194.9.31, 7172; User ID=sa; password = Excellent#9499@; Database = Comp0020_2023ES015009; Trusted_Connection=false; Encrypt=false; TrustServerCertificate=False; ");
@@ -72,15 +71,17 @@ public partial class DiamondFootwearWebContext : DbContext
         OnModelCreatingPartial(modelBuilder);*/
         modelBuilder.Entity<ValidateUserDet>().HasNoKey();
         modelBuilder.Entity<Response>().HasNoKey();
-        modelBuilder.Entity<Status>().HasNoKey();
+        modelBuilder.Entity<Results>().HasNoKey();
         modelBuilder.Entity<SaveUserRoleMaster>().HasNoKey();
         modelBuilder.Entity<GetUserRoleMaster>().HasNoKey();
         modelBuilder.Entity<SaveUsersMastDetail>().HasNoKey();
         modelBuilder.Entity<GetUserMasterDetail>().HasNoKey();
         modelBuilder.Entity<GetOrderReceivedDetail>().HasNoKey();
         modelBuilder.Entity<GetOrderReceivedItemDetail>().HasNoKey();
-        modelBuilder.Entity<UpdateOrderReceivedApproval>().HasNoKey();
         modelBuilder.Entity<SaveOrderAcceptTaskHead>().HasNoKey();
+        modelBuilder.Entity<GetOrderApprovelItems>().HasNoKey();
+        modelBuilder.Entity<SaveOrderTaskApproval>().HasNoKey();
+        modelBuilder.Entity<GetApprovelHoldDet>().HasNoKey();
 
         //modelBuilder.Entity<UsersValidator>(entity =>
         //{

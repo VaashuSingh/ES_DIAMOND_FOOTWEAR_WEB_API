@@ -15,10 +15,11 @@ namespace Diamond_Footwear_Services.DBContext
         public string? Msg { get; set; }
     }
 
-    public class Status
+    public partial class Results
     {
         public int Result { get; set; }
     }
+
     public class SaveUserRoleMaster
     {
         public int Id { get; set; }
@@ -51,16 +52,23 @@ namespace Diamond_Footwear_Services.DBContext
         public int VchCode { get; set; }
         public string? VchDate{ get; set; }
         public string? VchNo { get; set; }
+        public int vchSeries { get; set; }
         public string? PoNo {  get; set; }
         public int AccCode { get; set; } = 0;
         public int ItemCode { get; set; }
         public string? ItemName { get; set; }
+        public int MCode1 { get; set; }
+        public int MCode2 { get; set; }
+        public int MCode3 { get; set; }
+        public string? MName1 { get; set; }
+        public string? MName3 { get; set; }
+        public string? MName2 { get; set; }
         public int UCode { get; set; }
         public string? Unit { get; set; }
-        public string? AltUnit { get; set; }
         public string? Color { get; set; }
         public string? Size { get; set; }
         public double Qty { get; set; }
+        public string? AltUnit { get; set; }
         public double AltQty { get; set; }
         public double ClQty { get; set; }
         public double Price { get; set; }
@@ -69,20 +77,18 @@ namespace Diamond_Footwear_Services.DBContext
         public int Status {  get; set; }
     }
 
-    public class UpdateOrderReceivedApproval
-    {
-        public int VchCode { get; set; }
-        public string? Remarks { get; set; }
-    }
-
     public partial class OrderAcceptTask
     {
         public int VchCode { get; set; }
         public string? VchDate { get; set; }
         public string? VchNo { get; set; }
-        public int AccCode { get; set; }
+        public int VchSeries { get; set; }
         public string? PoNo { get; set; }
+        public int AccCode { get; set; }
         public int ItemCode { get; set; }
+        public int MCode1 { get; set; }
+        public int MCode2 { get; set; }
+        public int MCode3 { get; set; }
         public string? Color { get; set; }
         public string? Size { get; set; }
         public int UCode { get; set; }
@@ -98,7 +104,7 @@ namespace Diamond_Footwear_Services.DBContext
         public string? Prod_Date { get; set; }
         public string? Deli_Date { get; set; }
         public string? Person { get; set; }
-        public string? Remarks { get; set; }
+        public string? Remark { get; set; }
         public string? Users { get; set; }
     }
 
@@ -107,5 +113,51 @@ namespace Diamond_Footwear_Services.DBContext
         [NotMapped]
         public List<OrderAcceptTask> OrderAcceptTask { get; set; }
 
+    }
+
+    public class GetOrderApprovelItems
+    {
+        public int VchCode { get; set; }
+        public string? VchDate { get; set; }
+        public string? VchNo { get; set; }
+        public string? VchSeries { get; set; }
+        public string? PoNo { get; set; }
+        public string? AccName { get; set; }
+        public int TaskCode { get; set; }
+        public int TaskId { get; set; }
+        public string? TaskDesc { get; set; }
+        public string? TaskDate { get; set; }
+        public int TaskStatus { get; set; }
+        public string? Person { get; set; }
+        public string? Remark { get; set; }
+        public int ItemCode { get; set; }
+        public string? ItemName { get; set; }
+        public string? Unit { get; set; }
+        public string? MName1 { get; set; }
+        public string? MName3 { get; set; }
+        public string? MName2 { get; set; }
+        public string? Color { get; set; }
+        public string? Size { get; set; }
+        public double Qty { get; set; }
+        public double AltQty { get; set; }
+        public double Price { get; set; }
+        public double MRP { get; set; }
+        public double Amount { get; set; }
+    }
+
+    public class SaveOrderTaskApproval
+    {
+        public int VchCode { get; set; }
+        public int TaskCode { get; set; }
+        public int TaskId { get; set; } = 0;
+        public int Status { get; set; } = 0;
+        public string? Remark { get; set; }
+        public string? Users { get; set; }
+    }
+
+    public partial class GetApprovelHoldDet
+    {
+        public int Action { get; set; }
+        public string? Remark { get; set; }
     }
 }
