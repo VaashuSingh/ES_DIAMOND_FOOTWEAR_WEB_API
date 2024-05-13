@@ -383,7 +383,7 @@ namespace Diamond_Footwear_Services.Services
             try
             {
                 string busyComp = busyDb;
-                string sql = $"Select A.[VchCode], CONVERT(VARCHAR, A.[VchDate], 105) as VchDate, IsNull(A.[VchNo], '') as VchNo,IsNull(F.[Name], '') as VchSeries, IsNull(C.[Name], '') As AccName, IsNull(B.[PoNo], '') as PoNo, IsNull(A.[Person], '') as Person, IsNull(B.Code,0) as TaskCode, IsNull(B.[TaskId], 0) as TaskId, IsNull(B.[TaskDesc], '') as TaskDesc, CONVERT(VARCHAR, B.[TaskDate], 105) as TaskDate, IsNull(B.[Remark], '') as Remark,IsNull(B.[ItemCode], 0) as ItemCode, IsNull(D.[Name], '') as ItemName, IsNull(E.[Name], '') as Unit,IsNull(G.[Name],'') as MName1, IsNull(H.[Name],'') as MName2, IsNull(I.[Name], '') as MName3, IsNull(B.[Param1], '') as Color, IsNull(B.[Param2], '') as Size, IsNull(B.[Qty], 0) as Qty, IsNull(B.[AltQty], 0) as AltQty, IsNull(A.[Value4], 0) as MRP, IsNull(A.[Value5], 0) as Price, IsNull(A.[Value6], 0) as Amount, IsNull(B.[Status],0) as TaskStatus From ESOrderTask A Inner Join ESOrderTaskDetails B On A.Code = B.Code And A.VchCode = B.VchCode Left Join {busyComp}.dbo.Master1 C On A.MasterCode1 = C.Code Left Join {busyComp}.dbo.Master1 D On B.ItemCode = D.Code Left Join {busyComp}.dbo.Master1 E On A.Unit = E.Code Left Join Vchseries F On A.VchSeries = F.Code Left Join ESTechmaster G On A.CM1 = G.Code Left Join ESTechmaster H On A.CM2 = H.Code Left Join ESTechmaster I On A.CM3 = I.Code Where (B.[Status] Is Null Or B.[Status] In (0,2)) And B.TaskId = {TaskType}";
+                string sql = $"Select A.[VchCode], CONVERT(VARCHAR, A.[VchDate], 105) as VchDate, IsNull(A.[VchNo], '') as VchNo,IsNull(F.[Name], '') as VchSeries, IsNull(C.[Name], '') As AccName, IsNull(B.[PoNo], '') as PoNo, IsNull(A.[Person], '') as Person, IsNull(B.Code,0) as TaskCode, IsNull(B.[TaskId], 0) as TaskId, IsNull(B.[TaskDesc], '') as TaskDesc, CONVERT(VARCHAR, B.[TaskDate], 105) as TaskDate, IsNull(B.[Remark], '') as Remark,IsNull(B.[ItemCode], 0) as ItemCode, IsNull(D.[Name], '') as ItemName, IsNull(E.[Name], '') as Unit,IsNull(G.[Name],'') as MName1, IsNull(H.[Name],'') as MName2, IsNull(I.[Name], '') as MName3, IsNull(B.[Param1], '') as Color, IsNull(B.[Param2], '') as Size, IsNull(B.[Qty], 0) as Qty, IsNull(B.[AltQty], 0) as AltQty, IsNull(A.[Value4], 0) as MRP, IsNull(A.[Value5], 0) as Price, IsNull(A.[Value6], 0) as Amount, IsNull(B.[Status],0) as TaskStatus From ESOrderTask A Inner Join ESOrderTaskDetails B On A.Code = B.Code And A.VchCode = B.VchCode Left Join {busyComp}.dbo.Master1 C On A.MasterCode1 = C.Code Left Join {busyComp}.dbo.Master1 D On B.ItemCode = D.Code Left Join {busyComp}.dbo.Master1 E On A.Unit = E.Code Left Join Vchseries F On A.VchSeries = F.Code Left Join ESTechmaster G On A.CM1 = G.Code Left Join ESTechmaster H On A.CM2 = H.Code Left Join ESTechmaster I On A.CM3 = I.Code Where (B.[Status] Is Null Or B.[Status] In (0,2)) And B.TaskId = {TaskType} Order By A.VchDate, A.VchCode";
 
                 var data = await _db.GetOrderApprovelVches.FromSqlRaw(sql).ToListAsync();
 
@@ -409,9 +409,9 @@ namespace Diamond_Footwear_Services.Services
             {
                 SaveOrderTaskApproval task = new SaveOrderTaskApproval();
                 string date = DateTime.Now.ToString("dd-MMM-yyyy HH:mm:ss");
-                task.VchCode = obj.VchCode; task.TaskCode = obj.TaskCode; task.Status = obj.Status; task.Remark = obj.Remark;  task.TaskId = obj.TaskId; task.Users = obj.Users;
+                task.VchCode = obj.VchCode; task.TaskCode = obj.TaskCode; task.Status = obj.Status; task.Remark = obj.Remark;  task.TaskId = obj.TaskId; task.Users = obj.Users; task.CreatedOn = obj.CreatedOn;
 
-                string sql = $"UPDATE [ESORDERTASKDETAILS] Set [Status] = {task.Status}, [CompletedNarr] = '{task.Remark}', [CompletedBy] = '{task.Users}', [CompletedOn] = '{date}' Where VchCode = {task.VchCode} And Code = {task.TaskCode} And TaskId = {task.TaskId}" ;
+                string sql = $"UPDATE [ESORDERTASKDETAILS] Set [Status] = {task.Status}, [CompletedNarr] = '{task.Remark}', [CompletedBy] = '{task.Users}', [CompletedOn] = '{task.CreatedOn}' Where VchCode = {task.VchCode} And Code = {task.TaskCode} And TaskId = {task.TaskId}" ;
                 int result = await _db.Database.ExecuteSqlRawAsync(sql);
 
 
@@ -435,7 +435,6 @@ namespace Diamond_Footwear_Services.Services
             {
                 return new { Status = 0, Msg = ex.Message.ToString() };
             }
-            
         }
 
         public async Task<bool> ValidateTaskStatusCompletion(int VchCode, int TaskCode)
@@ -468,11 +467,12 @@ namespace Diamond_Footwear_Services.Services
                 return false;
             }
         }
+
         public async Task<dynamic> GetOrderApprovelItemHoldDetails(int TaskType, int TaskCode, int VchCode, int ItemCode)
         {
             try
             {
-                string sql = $"Select IsNull([Status], 0) as [Action],IsNull([CompletedNarr], '') as Remark From ESOrderTaskDetails Where VchCode = {VchCode} And Code = {TaskCode} And TaskId = {TaskType} And Status = 2 And ItemCode = {ItemCode}" ;
+                string sql = $"Select IsNull([Status], 0) as [Action],IsNull([CompletedNarr], '') as Remark, CONVERT(VARCHAR, CompletedOn, 105) as Date From ESOrderTaskDetails Where VchCode = {VchCode} And Code = {TaskCode} And TaskId = {TaskType} And Status = 2 And ItemCode = {ItemCode}" ;
                 var DT1 = await _db.GetApprovelHoldDets.FromSqlRaw(sql).ToListAsync();
 
                 if (DT1 != null && DT1.Count == 0) 
@@ -490,6 +490,182 @@ namespace Diamond_Footwear_Services.Services
                 return new { Status = 0, Msg = ex.Message.ToString() };
             }
             
+        }
+
+        public async Task<dynamic> GetOrderStatusReports(int AccCode, int ItemCode, string? OrderNo, int Status, string? StartDate, string? EndDate)
+        {
+            try
+            {
+                string sql = string.Empty;
+                string busyComp = busyDb;
+                int ActualStatus = 0;
+                if (Status > 0)
+                {
+                    if (Status == 1)
+                    {
+                        ActualStatus = 1;
+                    } 
+                    else if (Status == 2)
+                    {
+                        ActualStatus = 0;
+                    }
+                }
+
+                sql = $"Select A.[VchCode], A.[Code] as TaskCode, CONVERT(VARCHAR, A.VchDate, 105) as VchDate, IsNull(A.[VchNo], '') as VchNo, IsNull(A.[MasterCode1], 0) as AccCode,IsNull(B.[Name], '') as AccName, IsNull(A.[MasterCode2], 0) as ItemCode, IsNull(C.[Name], '') as ItemName, IsNull(A.[Param1], '') as Color, IsNull(A.[Param2], '') as Size, IsNull(A.[Value1], 0) as Qty, IsNull(A.[Value2], 0) as AltQty, IsNull(A.[Value4], 0) as MRP, IsNull(A.[Status], 0) as [Status], IsNull(A.[Person], '') as Person From ESOrderTask A Left Join {busyComp}.Dbo.Master1 B On A.[MasterCode1] = B.[Code] Left Join {busyComp}.Dbo.Master1 C On A.[MasterCode2] = C.[Code] Where 1 = 1 ";
+                if (AccCode > 0) sql += $" And A.[MasterCode1] = {AccCode} ";
+                if (ItemCode > 0) sql += $" And B.ItemCode = {ItemCode} " ;
+                if (OrderNo?.Length > 0) sql += $" And A.[VchNo] = '{OrderNo}'";
+                if (ActualStatus > 0) sql += $" And B.Status= {ActualStatus}";
+                if (StartDate?.Length > 0 && EndDate?.Length > 0) sql += $" And A.VchDate >= '{StartDate}' And A.VchDate <= '{EndDate}'";
+                sql += "Order By A.VchCode, A.VchDate";
+
+                var DT1 = await _db.GetOrderStatusRpts.FromSqlRaw(sql).ToListAsync();
+
+                if (DT1 != null && DT1.Count == 0) 
+                {
+                    return new { Status = 0, Msg = "Data Not Found. ", Data = DT1 };
+                }
+                else
+                {
+                    return new { Status = 1, Msg = "Success", Data = DT1 };
+                }
+            }
+            catch (Exception err)
+            {
+                return new { Status = 0, Msg = err.Message.ToString() };
+            }
+
+        }
+
+        public async Task<dynamic> GetBusyMasterLists(int TranType, int MasterType)
+        {
+            try
+            {
+                string busyComp = busyDb; string sql = string.Empty;
+                if (TranType == 1)
+                {
+                    sql = $"select CONVERT(INT, ROW_NUMBER() OVER (ORDER BY [VchNo])) As Value, IsNull([VchNo], '') as [Label] From ESOrderTask Group By [VchNo] Order By [VchNo]";
+                }
+                else if (TranType == 2)
+                {
+                    sql = $"select CONVERT(INT, ROW_NUMBER() OVER (ORDER BY [VchNo])) As Value, IsNull([VchNo], '') as [Label] From ESOrderTask Group By [VchNo] Order By [VchNo]";
+                }
+                else
+                {
+                    sql = $"select Top 70 IsNull([Code], 0) as Value, IsNull([Name], '') as Label From {busyComp}.Dbo.Master1 Where MasterType = {MasterType} Group By [Code], [Name] Order By [Name]";
+                }
+
+                var Res1 = await _db.GetBusyMasterLists.FromSqlRaw(sql).ToListAsync();
+
+                if (Res1 != null && Res1.Count == 0)
+                {
+                    return new { Status = 0, Msg = "Data Not Found. ", Data = Res1 };
+                }
+                else
+                {
+                    return new { Status = 1, Msg = "Success", Data = Res1 };
+                }
+
+            }
+            catch (Exception err)
+            {
+                return new { Status = 0, Msg = err.Message.ToString() };
+            }
+        }
+
+        //public async Task<dynamic> GetRolePermissionResponses(int RoleId)
+        //{
+        //    try
+        //    {
+        //        string sql = $"Select IsNull([MenuId], 0) as [Key], IsNull([I1], 0) as [Create], IsNull([I2], 0) as [Edit], IsNull([I3], 0) as [View], IsNull([I4], 0) as [Delete] From ESUserRolePermission Where MasterCode = {RoleId}";
+        //        var DT1 = await _db.PermissionResponses.FromSqlRaw(sql).ToListAsync();
+
+        //        if (DT1 == null || DT1.Count == 0)
+        //        {
+        //            return new { Status = 0, Msg = "Data Not Found. ", Data = DT1 };
+        //        }
+        //        else
+        //        {
+        //            List<GetRolePermissionResponse> ABH = new List<GetRolePermissionResponse>();
+
+        //            foreach (var DT2 in DT1)
+        //            {
+        //                GetRolePermissionResponse RList = new GetRolePermissionResponse();
+        //                RList.Key = DT2.Key;
+        //                RList.Permissions = new List<Permission> { new Permission { Create = DT2.Create, Edit = DT2.Edit,  View = DT2.View, Delete = DT2.Delete } };
+        //                ABH.Add(RList);
+        //            }
+
+        //            return new { Status = 1, Msg = "Success", Data = ABH };
+        //        }
+        //    }
+        //    catch (Exception err)
+        //    {
+        //        return new { Status = 0, Msg = err.Message.ToString() };
+        //    }
+        //}
+
+        public async Task<dynamic> GetUserRolePermissionResponses(int RoleId)
+        {
+            try
+            {
+                string sql = string.Empty;
+
+                sql = $"Select DISTINCT IsNull(A.[Code], 0) as MenuId, IsNull(A.[Name], '') as Menu, IsNull(B.[I1], 0) as [Create], IsNull(B.[I2], 0) as Edit, IsNull(B.[I3], 0) as [View], IsNull(B.[I4], 0) as [Delete] From [ESMENUMASTER] A Left Join [ESUserRights] B On A.[Code] = B.[MasterCode2] Where B.[MasterCode1] = {RoleId} And TranType = 2 ";
+                var DT1 = await _db.GetUserRolePermissionMenus.FromSqlRaw(sql).ToListAsync();
+
+                if (DT1 != null && DT1.Count == 0)
+                {
+                    sql = "Select IsNull(A.[Code], 0) as MenuId, IsNull(A.[Name], '') as Menu, 0 as [Create], 0 as Edit, 0 as [View], 0 as [Delete] From [ESMENUMASTER] A Left Join [ESUserRights] B On A.[Code] = B.MasterCode2 Where A.[TranType] = 2 Group By A.[Code], A.[Name] Order By A.[Code]";
+                    var DT2 = await _db.GetUserRolePermissionMenus.FromSqlRaw(sql).ToListAsync();
+
+                    if ( DT2.Count == 0)
+                    {
+                        return new { Status = 0, Msg = "Sorry, no results found! ", Data = DT2 };
+                    }
+                    else
+                    {
+                        return new { Status = 1, Msg = "Success ", Data = DT2 };
+                    }
+                }
+                else
+                {
+                    return new { Status = 1, Msg = "Success", Data = DT1 };
+                }
+            }
+            catch(Exception err)
+            {
+                return new { Status = 0, Msg = err.Message.ToString() };
+
+            }
+        }
+
+        public async Task<dynamic> SaveRolePermissionResponse(SaveRolePermissionResponse obj)
+        {
+            try
+            {
+                string xml = DiamondHelper.CreateXml(obj.PermissionData);
+                SqlParameter param0 = new SqlParameter("@p0", obj.RoleId);
+                SqlParameter param1 = new SqlParameter("@p1", xml.ToString());
+
+                var RT1 = await _db.Responses.FromSqlRaw("EXEC Dbo.[Sp_SaveMenuMasterPermission] @p0, @p1", param0, param1).ToListAsync();
+
+                int Status = RT1[0].Status;
+                string StatusStr = RT1[0].Msg;
+
+                if (Status == 0)
+                {
+                    return new { Status = 0, Msg = "Some Error Please Check Your JSON ...." };
+                }
+                else
+                {
+                    return new { Status = 1, Msg = StatusStr };
+                }
+            }
+            catch (Exception err)
+            {
+                return new { Status = 0, Msg = err.Message.ToString() };
+            }
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Diamond_Footwear_Services.DBContext
 {
     public class Response
     {
-        public int Status {  get; set; }
+        public int Status { get; set; }
         public string? Msg { get; set; }
     }
 
@@ -50,10 +50,10 @@ namespace Diamond_Footwear_Services.DBContext
     public class GetOrderReceivedItemDetail
     {
         public int VchCode { get; set; }
-        public string? VchDate{ get; set; }
+        public string? VchDate { get; set; }
         public string? VchNo { get; set; }
         public int vchSeries { get; set; }
-        public string? PoNo {  get; set; }
+        public string? PoNo { get; set; }
         public int AccCode { get; set; } = 0;
         public int ItemCode { get; set; }
         public string? ItemName { get; set; }
@@ -74,7 +74,7 @@ namespace Diamond_Footwear_Services.DBContext
         public double Price { get; set; }
         public double MRP { get; set; }
         public double Amount { get; set; }
-        public int Status {  get; set; }
+        public int Status { get; set; }
     }
 
     public partial class OrderAcceptTask
@@ -153,11 +153,77 @@ namespace Diamond_Footwear_Services.DBContext
         public int Status { get; set; } = 0;
         public string? Remark { get; set; }
         public string? Users { get; set; }
+        public string? CreatedOn { get; set; }
     }
 
     public partial class GetApprovelHoldDet
     {
         public int Action { get; set; }
         public string? Remark { get; set; }
+        public string? Date { get; set; }
     }
+
+    //**************************************************** Busy Report ****************************************************//
+
+    public partial class GetOrderStatusRpt
+    {
+        public int VchCode { get; set; }
+        public int TaskCode { get; set; }
+        public string? VchDate { get; set; }
+        public string? VchNo { get; set; }
+        public int Acccode { get; set; }
+        public string? AccName { get; set; }
+        public int? ItemCode { get; set; }
+        public string? ItemName { get; set; }
+        public string? Color { get; set; }
+        public string? Size { get; set; }
+        public double Qty { get; set; }
+        public double AltQty { get; set; }
+        public double MRP { get; set; }
+        public int Status { get; set; }
+        public string? Person
+        {
+            get; set;
+        }
+    }
+
+    //**************************************************** Busy Master ****************************************************//
+
+    public partial class GetBusyMasterList
+    {
+        public int Value { get; set; }
+        public string? Label { get; set; }
+    }
+
+    //**************************************************** Role Permission And User Right Classes ****************************************************//
+
+    public partial class GetUserRolePermissionMenu
+    {
+        public int MenuId { get; set; }
+        public string? Menu { get; set; }
+        public int Create { get; set; }
+        public int Edit { get; set;}
+        public int? View { get; set; }
+        public int? Delete { get; set; }
+
+    }
+
+    public class Permission
+    {
+        public int MenuId { get; set; }
+        public int Create { get; set; }
+        public int Edit { get; set; }
+        public int View { get; set; }
+        public int Delete { get; set; }
+
+    }
+
+    public class SaveRolePermissionResponse
+    {
+        public int RoleId { get; set; }
+
+        [NotMapped]
+        public List<Permission> PermissionData { get; set; }
+    }
+
 }

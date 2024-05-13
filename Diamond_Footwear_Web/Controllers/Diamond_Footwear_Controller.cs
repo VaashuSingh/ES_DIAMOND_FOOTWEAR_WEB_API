@@ -105,5 +105,29 @@ namespace Diamond_Footwear_Web.Controllers
         {
             return Ok(await _service.GetOrderApprovelItemHoldDetails(TaskType, TaskCode, VchCode, ItemCode));
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetOrderStatusReport(int AccCode, int ItemCode, string? OrderNo, int Status, string? StartDate, string? EndDate)
+        {
+            return Ok(await _service.GetOrderStatusReports(AccCode, ItemCode, OrderNo, Status, StartDate, EndDate));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetBusyMasterList(int TranType, int MasterType)
+        {
+            return Ok(await _service.GetBusyMasterLists(TranType, MasterType));
+        }
+
+        [HttpGet("{RoleId:int}")]
+        public async Task<IActionResult> GetUserRolePermissionMenu(int RoleId)
+        {
+            return Ok(await _service.GetUserRolePermissionResponses(RoleId));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveUserRolePermissionResponse(SaveRolePermissionResponse obj)
+        {
+            return Ok(await _service.SaveRolePermissionResponse(obj));
+        }
     }
 }

@@ -3,10 +3,14 @@
 ALTER TABLE ESUSERMASTER ALTER COLUMN [Password] VARCHAR(30) COLLATE Latin1_General_CS_AS NOT NULL;
 
 -- CREATE TABLE
-CREATE TABLE [ESUserMaster] ([UID] int Primary Key Identity(1,1) Not Null,[UserType] int Null, [UserName] Varchar(60) Null, [Mobile] Varchar(30) Null, [Email] Varchar(40) Null, [Password] Varchar(40) Null,[Role] Int Null,[Description] Varchar(605) Null, [DocAttach] int Null, [Base64] ntext, [Active] Int Null, [IsDeleted] Int Default 0, [Admin] Int Null, [CreatedBy] Varchar(40) null, [CreatedOn] Datetime Null)
+CREATE TABLE [ESUserMaster] ([UID] int Primary Key Identity(1,1) Not Null, [UserType] int Null, [UserName] Varchar(60) Null, [Mobile] Varchar(30) Null, [Email] Varchar(40) Null, [Password] Varchar(40) Null,[Role] Int Null,[Description] Varchar(605) Null, [DocAttach] int Null, [Base64] ntext, [Active] Int Null, [IsDeleted] Int Default 0, [Admin] Int Null, [CreatedBy] Varchar(40) null, [CreatedOn] Datetime Null)
 
 CREATE TABLE [ESMaster1] ([Code] Int Primary Key Identity (1,1) Not Null, [Name] Varchar(50) Null, ParentGrp Int Null, MasterType Int Null, CreatedBy Varchar(50) Null,[IsDeleted] Int Default 0, CreatedOn DateTime Null)
 
 CREATE TABLE [ESOrderTask] ([Code] INT PRIMARY KEY IDENTITY(1,1), [VchCode] Int Null, [VchDate] DateTime Null, [VchNo] Varchar(40) Null, [VchSeries] Int Null,[MasterCode1] Int Null,[MasterCode2] Int NUll, [CM1] Int Null, [CM2] Int Null, [CM3] Int Null,[Param1] Varchar(30) Null,[Param2] Varchar(30) Null,[Unit] Int Null,[Value1] Float Null,[Value2] Float Null,[Value3] Float Null,[Value4] Float Null,[Value5] Float Null,[Value6] Float Null,[Person] Varchar(50) NUll,[Status] Int Null)
 
 CREATE TABLE [ESOrderTaskDetails] (Code INT Null, [VchCode] int Null, [VchDate] Datetime Null, [VchNo] Varchar(40) Null,  [AccCode] Int Null, [PoNo] Varchar(30) Null, [TaskId] Int Null,[TaskDesc] Varchar(30) Null,[TaskDate] DateTime Null,[ItemCode] Int Null,[Param1] Varchar(30) Null,[Param2] Varchar(30) Null,[Qty] Float Null,[AltQty] Float Null,[Remark] Varchar(200) Null, [Status] Int Null,[CompletedNarr] Varchar(200) Null, [CompletedBy] Varchar(50) NUll,[CompletedOn] DateTime Null)
+
+CREATE TABLE [ESMenuMaster] ([Code] INT IDENTITY(1001,1) PRIMARY KEY Not Null, [Name] Varchar(60) Null, [ParentId] Int Null, [Path] Varchar(60) Null, [MenuIcon] Varchar(60) Null, [Ordering1] Int Null, [Ordering2] Int Null, [SubMenu] Int Null, [TranType] Int Null)
+
+CREATE TABLE [ESUserRights] ([MasterCode1] Int Null, [MasterCode2] Int Null, [I1] Int Null, [I2] Int Null, [I3] Int Null, [I4] Int Null, [I5] Int Null, [I6] Int Null)

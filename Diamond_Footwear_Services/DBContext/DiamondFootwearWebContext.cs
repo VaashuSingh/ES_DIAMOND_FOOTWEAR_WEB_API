@@ -28,7 +28,10 @@ public partial class DiamondFootwearWebContext : DbContext
     public virtual DbSet<GetOrderApprovelItems> GetOrderApprovelVches { get; set; }
     public virtual DbSet<SaveOrderTaskApproval> SaveOrderTaskApprovals { get; set; }
     public virtual DbSet<GetApprovelHoldDet> GetApprovelHoldDets { get; set; }
-
+    public virtual DbSet<GetOrderStatusRpt> GetOrderStatusRpts { get; set; }
+    public virtual DbSet<GetBusyMasterList> GetBusyMasterLists { get; set; }
+    public virtual DbSet<GetUserRolePermissionMenu> GetUserRolePermissionMenus { get; set; }
+    public virtual DbSet<SaveRolePermissionResponse> SaveRolePermissionResponses { get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Server = 103.194.9.31, 7172; User ID=sa; password = Excellent#9499@; Database = Comp0020_2023ES015009; Trusted_Connection=false; Encrypt=false; TrustServerCertificate=False; ");
@@ -82,6 +85,10 @@ public partial class DiamondFootwearWebContext : DbContext
         modelBuilder.Entity<GetOrderApprovelItems>().HasNoKey();
         modelBuilder.Entity<SaveOrderTaskApproval>().HasNoKey();
         modelBuilder.Entity<GetApprovelHoldDet>().HasNoKey();
+        modelBuilder.Entity<GetOrderStatusRpt>().HasNoKey();
+        modelBuilder.Entity<GetBusyMasterList>().HasNoKey();
+        modelBuilder.Entity<GetUserRolePermissionMenu>().HasNoKey();
+        modelBuilder.Entity<SaveRolePermissionResponse>().HasNoKey();
 
         //modelBuilder.Entity<UsersValidator>(entity =>
         //{
