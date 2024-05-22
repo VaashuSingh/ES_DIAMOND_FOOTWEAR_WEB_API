@@ -1,0 +1,11 @@
+Select Top 1 0 as TranType,0 as PMenuOrd,M.SubMenu,0 as MenuId,(Case When M.SubMenu = 1 then 'Main' When M.SubMenu = 2 then 'Users' When M.SubMenu = 3 then 'Peoples' else '' End) as Name,0 ParentID,'' as [Path],'' as MenuIcon,0 as I1,0 as I2,0 as I3,0 as I4,0 as I5 From Usermaster A Inner join UserRight U On A.[Role] = U.[Role] Inner Join MenuMaster M On U.MenuId = M.Id  Where A.Code = 11
+And (IsNull(I1,0) = 1 Or IsNull(I2,0) = 1 Or IsNull(I3,0) = 1 Or IsNull(I4,0) = 1 Or IsNull(I5,0) = 1)
+Group by M.SubMenu Order By M.SubMenu
+
+Select Top 1 M1.TranType,M.SubMenu,M.PMenuOrd,M.ParentId as MenuID,IsNull(M1.Name,'') as Name,0 ParentID,'' as [Path],'' as MenuIcon,0 as I1,0 as I2,0 as I3,0 as I4,0 as I5 From Usermaster A Inner join UserRight U On A.[Role] = U.[Role] Inner Join MenuMaster M On U.MenuId = M.Id Left Join MenuMaster M1 On M.ParentId = M1.ID	Where A.Code = 11 And M.SubMenu = 5
+And (IsNull(I1,0) = 1 Or IsNull(I2,0) = 1 Or IsNull(I3,0) = 1 Or IsNull(I4,0) = 1 Or IsNull(I5,0) = 1) Group By M.PMenuOrd,M.ParentId,M1.Name,M1.TranType,M.SubMenu
+Order By M.PMenuOrd
+
+Select Top 1 M.TranType,M.PMenuOrd,M.SubMenu,U.MenuId,M.Name,M.ParentID,M.[Path],M.MenuIcon,IsNull(I1,0) as I1,IsNull(I2,0) as I2,IsNull(I3,0) as I3,IsNull(I4,0) as I4,IsNull(I5,0) as I5 From Usermaster A Inner join UserRight U On A.[Role] = U.[Role] Inner Join MenuMaster M On U.MenuId = M.Id  Where A.Code = 11 And M.SubMenu = 5 And M.PMenuOrd = 2 And M.ParentID = 3
+And (IsNull(I1,0) = 1 Or IsNull(I2,0) = 1 Or IsNull(I3,0) = 1 Or IsNull(I4,0) = 1 Or IsNull(I5,0) = 1)
+Order By M.PMenuOrd,M.[Ordering]

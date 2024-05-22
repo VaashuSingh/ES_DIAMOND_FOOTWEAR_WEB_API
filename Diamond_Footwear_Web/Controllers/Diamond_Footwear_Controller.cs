@@ -129,5 +129,11 @@ namespace Diamond_Footwear_Web.Controllers
         {
             return Ok(await _service.SaveRolePermissionResponse(obj));
         }
+
+        [HttpGet("{UserId}")]
+        public async Task<IActionResult> GetUserMenusResponse(int UserId)
+        {
+            return Ok(await _service.GetUserMenusResponse(UserId));
+        }
     }
 }

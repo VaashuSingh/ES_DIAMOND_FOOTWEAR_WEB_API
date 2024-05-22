@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using System.Xml;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace Diamond_Footwear_Services.DBContext
 {
@@ -128,5 +129,24 @@ namespace Diamond_Footwear_Services.DBContext
             return type.IsGenericType && type.GetGenericTypeDefinition().Equals(typeof(Nullable<>));
         }
 
+        public static string StringManipulatorExtractFirstTag(string input)
+        {
+            // Regular expression pattern to match HTML/XML-like tags
+            string pattern = @"<[^>]+>";
+
+            // Find the first match in the input string
+            Match match = Regex.Match(input, pattern);
+
+            if (match.Success)
+            {
+                // Return the matched tag
+                return match.Value;
+            }
+            else
+            {
+                // Return an empty string if no match is found
+                return input.ToString();
+            }
+        }
     }
 }

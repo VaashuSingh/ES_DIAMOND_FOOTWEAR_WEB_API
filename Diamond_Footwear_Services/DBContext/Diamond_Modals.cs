@@ -226,4 +226,25 @@ namespace Diamond_Footwear_Services.DBContext
         public List<Permission> PermissionData { get; set; }
     }
 
+    public class UserMenus
+    {
+        public int MenuId { get; set; }
+        public string? Label { get; set; }
+        public int ParentId { get; set; }
+        public string? Link { get; set; }
+        public string? Icon { get; set; }
+        public bool SubmenuOpen { get; set; }
+        public bool ShowSubRoute { get; set; }
+        public bool Submenu { get; set; }
+        public string? SubmenuHdr { get; set; }
+        public int SubMenuNo { get; set; }
+        public int PMenuOrd { get; set; }
+        public int TranType { get; set; }
+        //public int Right1 { get; set; }
+        //public int Right2 { get; set; }
+        //public int Right3 { get; set; }
+        //public int Right4 { get; set; }
+        //public int Right5 { get; set; }
+        public List<UserMenus> SubmenuItems { get; set; }
+    }
 }

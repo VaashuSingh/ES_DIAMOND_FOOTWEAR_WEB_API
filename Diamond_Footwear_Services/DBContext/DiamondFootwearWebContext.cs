@@ -32,6 +32,7 @@ public partial class DiamondFootwearWebContext : DbContext
     public virtual DbSet<GetBusyMasterList> GetBusyMasterLists { get; set; }
     public virtual DbSet<GetUserRolePermissionMenu> GetUserRolePermissionMenus { get; set; }
     public virtual DbSet<SaveRolePermissionResponse> SaveRolePermissionResponses { get; set; }
+    public virtual DbSet<UserMenus> UserMenuss { get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Server = 103.194.9.31, 7172; User ID=sa; password = Excellent#9499@; Database = Comp0020_2023ES015009; Trusted_Connection=false; Encrypt=false; TrustServerCertificate=False; ");
@@ -89,6 +90,7 @@ public partial class DiamondFootwearWebContext : DbContext
         modelBuilder.Entity<GetBusyMasterList>().HasNoKey();
         modelBuilder.Entity<GetUserRolePermissionMenu>().HasNoKey();
         modelBuilder.Entity<SaveRolePermissionResponse>().HasNoKey();
+        modelBuilder.Entity<UserMenus>().HasNoKey();
 
         //modelBuilder.Entity<UsersValidator>(entity =>
         //{

@@ -1,0 +1,37 @@
+public async Task<dynamic> LoadUserMenu(int UType, int UserID)
+        {
+            List<UserMenus> Menus = new List<UserMenus>();
+            try
+            {
+                Menus = await GetSubUserMenu(UType, 0, UserID);
+            }
+            catch (Exception EX)
+            {
+                return new { Status = 0, Msg = EX.Message.ToString(), Data = Menus };
+            }
+            return new { Status = 1, Msg = "Success", Data = Menus };
+        }
+
+        public async Task<List<UserMenus>> GetSubUserMenu(int UType, int ParentID, int UserID)
+        {
+            List<UserMenus> Menus = new List<UserMenus>();
+
+            string sql = "Select Cast(A.Code as Varchar) as [key],A.Name as label,Cast(A.PtrNode as Varchar) as type,A.[Address] as address,Cast(A.MT as Varchar) as Mt,A.Address1 as MtMaddress,A.ImgPath as ImgPath From MenuMaster A Inner Join EsUserRight UR On A.Code = UR.RCode Where A.UT = " + UType + " And A.PrtCode = " + ParentID + " And UR.Code = " + UserID + "";
+            //string sql = "Select Cast(A.Code as Varchar) as [key],A.Name as label,Cast(A.PtrNode as Varchar) as type,A.[Address] as address,Cast(A.MT as Varchar) as Mt,A.Address1 as MtMaddress,A.ImgPath as ImgPath From MenuMaster A Where A.UT = " + UType + " And A.PrtCode = " + ParentID + " Order By A.Code";
+            var DT = await _db.dbMenus.FromSqlRaw(sql).ToListAsync();
+
+            foreach (var item in DT)
+            {
+                UserMenus menu = new UserMenus();
+                menu.Key = item.Key;
+                menu.label = item.label;
+                menu.type = item.type;
+                menu.address = item.address;
+                menu.Mt = item.Mt;
+                menu.MtMaddress = item.MtMaddress;
+                menu.ImgPath = item.ImgPath;
+                menu.Children = await GetSubUserMenu(UType, Convert.ToInt32(item.Key), UserID);
+                Menus.Add(menu);
+            }
+            return Menus;
+        }

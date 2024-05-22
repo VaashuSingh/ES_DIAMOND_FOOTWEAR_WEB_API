@@ -25,5 +25,7 @@ namespace Diamond_Footwear_Services.Services
         public Task<dynamic> GetBusyMasterLists(int TranType, int MasterType);
         public Task<dynamic> GetUserRolePermissionResponses(int RoleId);
         public Task<dynamic> SaveRolePermissionResponse(SaveRolePermissionResponse obj);
+        public Task<dynamic> GetUserMenusResponse(int UserId);
+
     }
 }

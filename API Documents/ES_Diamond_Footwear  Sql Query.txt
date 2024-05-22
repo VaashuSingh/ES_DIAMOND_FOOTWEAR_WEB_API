@@ -11,6 +11,6 @@ CREATE TABLE [ESOrderTask] ([Code] INT PRIMARY KEY IDENTITY(1,1), [VchCode] Int 
 
 CREATE TABLE [ESOrderTaskDetails] (Code INT Null, [VchCode] int Null, [VchDate] Datetime Null, [VchNo] Varchar(40) Null,  [AccCode] Int Null, [PoNo] Varchar(30) Null, [TaskId] Int Null,[TaskDesc] Varchar(30) Null,[TaskDate] DateTime Null,[ItemCode] Int Null,[Param1] Varchar(30) Null,[Param2] Varchar(30) Null,[Qty] Float Null,[AltQty] Float Null,[Remark] Varchar(200) Null, [Status] Int Null,[CompletedNarr] Varchar(200) Null, [CompletedBy] Varchar(50) NUll,[CompletedOn] DateTime Null)
 
-CREATE TABLE [ESMenuMaster] ([Code] INT IDENTITY(1001,1) PRIMARY KEY Not Null, [Name] Varchar(60) Null, [ParentId] Int Null, [Path] Varchar(60) Null, [MenuIcon] Varchar(60) Null, [Ordering1] Int Null, [Ordering2] Int Null, [SubMenu] Int Null, [TranType] Int Null)
+CREATE TABLE [ESMenuMaster] ([Code] INT IDENTITY(1001,1) PRIMARY KEY Not Null, [Name] Varchar(60) Null, [ParentId] Int Null, [Path] Varchar(60) Null, [MenuIcon] Varchar(60) Null, [Ordering1] Int Null, [Ordering2] Int Null, [Ordering3] Int Null, [TranType] Int Null)
 
 CREATE TABLE [ESUserRights] ([MasterCode1] Int Null, [MasterCode2] Int Null, [I1] Int Null, [I2] Int Null, [I3] Int Null, [I4] Int Null, [I5] Int Null, [I6] Int Null)

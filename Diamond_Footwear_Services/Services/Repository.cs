@@ -7,12 +7,17 @@ using Microsoft.VisualBasic;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Reflection.PortableExecutable;
+using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.JavaScript;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Diamond_Footwear_Services.Services
@@ -21,11 +26,11 @@ namespace Diamond_Footwear_Services.Services
     {
         public readonly DiamondFootwearWebContext _db;
 
-        public readonly string busyDb  = "";
+        public readonly string busyDb = "";
         private DateTime date;
 
-        public Repository(DiamondFootwearWebContext db, IConfiguration config) 
-        { 
+        public Repository(DiamondFootwearWebContext db, IConfiguration config)
+        {
             this._db = db;
 #pragma warning disable CS8601 // Possible null reference assignment.
             this.busyDb = config.GetSection("BusyInfo").GetSection("BusyDbName").Value;
@@ -56,7 +61,7 @@ namespace Diamond_Footwear_Services.Services
             ValidateUserDet UserDT = new ValidateUserDet(); int Status = 0; string StatusStr = ""; string token = null;
             try
             {
-                ValidateUser User1 = new ValidateUser(); string sql  = ""; 
+                ValidateUser User1 = new ValidateUser(); string sql = "";
                 User1.UserName = obj.UserName; User1.Password = obj.Password;
 
                 sql = $"SELECT TOP 1 [UID] as [UserId],ISNULL([UserName],'') as [Name], ISNULL([Base64],'') as [Images], ISNULL([UserType],0) as [UserType], ISNULL([Active],0) as [Active], ISNULL([Admin], 0) as [Admin] FROM ESUSERMASTER WHERE ([EMAIL] = '{User1.UserName}' OR MOBILE = '{User1.UserName}') AND [PASSWORD] = '{User1.Password}' And [IsDeleted] <> 1 ";
@@ -107,7 +112,7 @@ namespace Diamond_Footwear_Services.Services
             {
                 return new { Status = 0, Msg = ex.Message.ToString(), Data = UserDT, Token = token };
             }
-            return new { Status = Status, Msg = StatusStr, Data =  UserDT, Token = token };
+            return new { Status = Status, Msg = StatusStr, Data = UserDT, Token = token };
         }
 
         //public async Task<dynamic> DeleteMaster(int TranType, int MasterType, int Id)
@@ -208,7 +213,7 @@ namespace Diamond_Footwear_Services.Services
 
         public async Task<dynamic> SaveUserRoleMaster(SaveUserRoleMaster Obj)
         {
-            int Status = 0; string? StatusStr = ""; 
+            int Status = 0; string? StatusStr = "";
             try
             {
                 DateTime dateTime = DateTime.Now; int MasterType = 1;
@@ -218,7 +223,7 @@ namespace Diamond_Footwear_Services.Services
                 SqlParameter role2 = new SqlParameter("@R2", MasterType);
                 SqlParameter role3 = new SqlParameter("@R3", 'A');
                 SqlParameter role4 = new SqlParameter("@R4", dateTime);
-                
+
                 var DT = await _db.Responses.FromSqlRaw("EXEC [Sp_SaveUserRoleMaster] @R0, @R1, @R2, @R3, @R4", role0, role1, role2, role3, role4).ToListAsync();
 
                 Status = DT[0].Status;
@@ -232,7 +237,7 @@ namespace Diamond_Footwear_Services.Services
         }
 
         public async Task<dynamic> SaveUserMastDetails(SaveUsersMastDetail obj)
-        {   
+        {
             int Status = 0; string? StatusStr = "";
 
             try
@@ -270,7 +275,7 @@ namespace Diamond_Footwear_Services.Services
             List<GetUserMasterDetail> UList = new List<GetUserMasterDetail>();
             try
             {
-                string sql = "" ;
+                string sql = "";
                 if (UserId > 0)
                 {
                     sql = $"select A.[UID] as UserId, IsNull(A.[UserName], '') as Username, IsNull(A.[Mobile],'') as MobileNo, IsNull(A.[Email], '') as EmailId, IsNull(A.[Password], '') as PWD, IsNull(A.[Role], 0) as RoleId,IsNull(B.[Name], '') as RoleName, IsNull(A.[Description], '') as [Desc], IsNull([DocAttach], '') as Doc1, IsNull([Base64], '') as [Image], IsNull(Active, 0) as Active, CONVERT(VARCHAR(10), A.CreatedOn, 105) as CreatedOn From ESUserMaster A Left Join ESMaster1 B On A.[Role] = B.[Code] And B.[MasterType] = 1 Where A.[UserType] = {UserType} And A.[UID] = {UserId} And A.[IsDeleted] <> 1 Order By A.[CreatedOn] ";
@@ -298,7 +303,7 @@ namespace Diamond_Footwear_Services.Services
                 string sql = $"select Top 1 IsNull([Role],0) as Result, '' as Msg, 0 as Status From ESUserMaster Where [Role] = {id} And IsDeleted <> 1";
                 var Result = _db.Responses.FromSqlRaw(sql).FirstOrDefault();
 
-                if (Result != null) 
+                if (Result != null)
                     return true;
                 else
                     return false;
@@ -338,7 +343,7 @@ namespace Diamond_Footwear_Services.Services
 
         public async Task<dynamic> GetOrderReceivedItemsDetails(int VchCode)
         {
-            List<GetOrderReceivedItemDetail> RList1 = new  List<GetOrderReceivedItemDetail>();
+            List<GetOrderReceivedItemDetail> RList1 = new List<GetOrderReceivedItemDetail>();
             try
             {
                 string? busyComp = busyDb;
@@ -357,7 +362,7 @@ namespace Diamond_Footwear_Services.Services
 
         public async Task<dynamic> SaveOrderAcceptTasks(SaveOrderAcceptTaskHead obj)
         {
-            int Status = 0; string StatusStr  = string.Empty;
+            int Status = 0; string StatusStr = string.Empty;
             try
             {
 #pragma warning disable CS8604 // Possible null reference argument.
@@ -409,13 +414,13 @@ namespace Diamond_Footwear_Services.Services
             {
                 SaveOrderTaskApproval task = new SaveOrderTaskApproval();
                 string date = DateTime.Now.ToString("dd-MMM-yyyy HH:mm:ss");
-                task.VchCode = obj.VchCode; task.TaskCode = obj.TaskCode; task.Status = obj.Status; task.Remark = obj.Remark;  task.TaskId = obj.TaskId; task.Users = obj.Users; task.CreatedOn = obj.CreatedOn;
+                task.VchCode = obj.VchCode; task.TaskCode = obj.TaskCode; task.Status = obj.Status; task.Remark = obj.Remark; task.TaskId = obj.TaskId; task.Users = obj.Users; task.CreatedOn = obj.CreatedOn;
 
-                string sql = $"UPDATE [ESORDERTASKDETAILS] Set [Status] = {task.Status}, [CompletedNarr] = '{task.Remark}', [CompletedBy] = '{task.Users}', [CompletedOn] = '{task.CreatedOn}' Where VchCode = {task.VchCode} And Code = {task.TaskCode} And TaskId = {task.TaskId}" ;
+                string sql = $"UPDATE [ESORDERTASKDETAILS] Set [Status] = {task.Status}, [CompletedNarr] = '{task.Remark}', [CompletedBy] = '{task.Users}', [CompletedOn] = '{task.CreatedOn}' Where VchCode = {task.VchCode} And Code = {task.TaskCode} And TaskId = {task.TaskId}";
                 int result = await _db.Database.ExecuteSqlRawAsync(sql);
 
 
-                if (result == 0) 
+                if (result == 0)
                 {
                     return new { Status = 0, Msg = "Unable to find order. Please verify the order details.!" };
 
@@ -472,14 +477,14 @@ namespace Diamond_Footwear_Services.Services
         {
             try
             {
-                string sql = $"Select IsNull([Status], 0) as [Action],IsNull([CompletedNarr], '') as Remark, CONVERT(VARCHAR, CompletedOn, 105) as Date From ESOrderTaskDetails Where VchCode = {VchCode} And Code = {TaskCode} And TaskId = {TaskType} And Status = 2 And ItemCode = {ItemCode}" ;
+                string sql = $"Select IsNull([Status], 0) as [Action],IsNull([CompletedNarr], '') as Remark, CONVERT(VARCHAR, CompletedOn, 105) as Date From ESOrderTaskDetails Where VchCode = {VchCode} And Code = {TaskCode} And TaskId = {TaskType} And Status = 2 And ItemCode = {ItemCode}";
                 var DT1 = await _db.GetApprovelHoldDets.FromSqlRaw(sql).ToListAsync();
 
-                if (DT1 != null && DT1.Count == 0) 
+                if (DT1 != null && DT1.Count == 0)
                 {
                     return new { Status = 0, Msg = "Data Not Found", Data = DT1 };
-                } 
-                else 
+                }
+                else
                 {
                     return new { Status = 1, Msg = "Success", Data = DT1 };
                 }
@@ -489,7 +494,7 @@ namespace Diamond_Footwear_Services.Services
             {
                 return new { Status = 0, Msg = ex.Message.ToString() };
             }
-            
+
         }
 
         public async Task<dynamic> GetOrderStatusReports(int AccCode, int ItemCode, string? OrderNo, int Status, string? StartDate, string? EndDate)
@@ -504,7 +509,7 @@ namespace Diamond_Footwear_Services.Services
                     if (Status == 1)
                     {
                         ActualStatus = 1;
-                    } 
+                    }
                     else if (Status == 2)
                     {
                         ActualStatus = 0;
@@ -513,15 +518,16 @@ namespace Diamond_Footwear_Services.Services
 
                 sql = $"Select A.[VchCode], A.[Code] as TaskCode, CONVERT(VARCHAR, A.VchDate, 105) as VchDate, IsNull(A.[VchNo], '') as VchNo, IsNull(A.[MasterCode1], 0) as AccCode,IsNull(B.[Name], '') as AccName, IsNull(A.[MasterCode2], 0) as ItemCode, IsNull(C.[Name], '') as ItemName, IsNull(A.[Param1], '') as Color, IsNull(A.[Param2], '') as Size, IsNull(A.[Value1], 0) as Qty, IsNull(A.[Value2], 0) as AltQty, IsNull(A.[Value4], 0) as MRP, IsNull(A.[Status], 0) as [Status], IsNull(A.[Person], '') as Person From ESOrderTask A Left Join {busyComp}.Dbo.Master1 B On A.[MasterCode1] = B.[Code] Left Join {busyComp}.Dbo.Master1 C On A.[MasterCode2] = C.[Code] Where 1 = 1 ";
                 if (AccCode > 0) sql += $" And A.[MasterCode1] = {AccCode} ";
-                if (ItemCode > 0) sql += $" And B.ItemCode = {ItemCode} " ;
+                if (ItemCode > 0) sql += $" And A.[MasterCode2] = {ItemCode} ";
                 if (OrderNo?.Length > 0) sql += $" And A.[VchNo] = '{OrderNo}'";
-                if (ActualStatus > 0) sql += $" And B.Status= {ActualStatus}";
+                if (ActualStatus > 0) sql += $" And A.Status= {ActualStatus}";
+
                 if (StartDate?.Length > 0 && EndDate?.Length > 0) sql += $" And A.VchDate >= '{StartDate}' And A.VchDate <= '{EndDate}'";
                 sql += "Order By A.VchCode, A.VchDate";
 
                 var DT1 = await _db.GetOrderStatusRpts.FromSqlRaw(sql).ToListAsync();
 
-                if (DT1 != null && DT1.Count == 0) 
+                if (DT1 != null && DT1.Count == 0)
                 {
                     return new { Status = 0, Msg = "Data Not Found. ", Data = DT1 };
                 }
@@ -619,7 +625,7 @@ namespace Diamond_Footwear_Services.Services
                     sql = "Select IsNull(A.[Code], 0) as MenuId, IsNull(A.[Name], '') as Menu, 0 as [Create], 0 as Edit, 0 as [View], 0 as [Delete] From [ESMENUMASTER] A Left Join [ESUserRights] B On A.[Code] = B.MasterCode2 Where A.[TranType] = 2 Group By A.[Code], A.[Name] Order By A.[Code]";
                     var DT2 = await _db.GetUserRolePermissionMenus.FromSqlRaw(sql).ToListAsync();
 
-                    if ( DT2.Count == 0)
+                    if (DT2.Count == 0)
                     {
                         return new { Status = 0, Msg = "Sorry, no results found! ", Data = DT2 };
                     }
@@ -633,7 +639,7 @@ namespace Diamond_Footwear_Services.Services
                     return new { Status = 1, Msg = "Success", Data = DT1 };
                 }
             }
-            catch(Exception err)
+            catch (Exception err)
             {
                 return new { Status = 0, Msg = err.Message.ToString() };
 
@@ -667,5 +673,89 @@ namespace Diamond_Footwear_Services.Services
                 return new { Status = 0, Msg = err.Message.ToString() };
             }
         }
+
+        public async Task<dynamic> GetUserMenusResponse(int userId)
+        {
+            try
+            {
+                List<UserMenus> menus = await GetSubUserMenu(userId, 0, 0, 0, 1);
+                return new { Status = 1, Msg = "Success", Data = menus };
+            }
+            catch (Exception ex)
+            {
+                return new { Status = 0, Msg = ex.Message.ToString(), Data = new List<UserMenus>() };
+            }
+        }
+
+        public async Task<List<UserMenus>> GetSubUserMenu(int UserId, int SubMenu, int ParentId, int PMenuOrd, int TranType)
+        {
+            List<UserMenus> Menus = new List<UserMenus>();
+            string sql = string.Empty;
+            if (TranType == 1)
+            {
+                sql = $"Select CAST(1 AS BIT) as SubmenuOpen, CAST(0 AS BIT) as showSubRoute, CAST(0 AS BIT) as submenu, 0 as TranType, 0 as PMenuOrd, M.[Ordering2] as SubMenuNo, 0 as MenuId, (Case When M.Ordering2 = 1 then 'Main' When M.Ordering2 = 2 then 'Transaction' When M.Ordering2 = 3 then 'Report' When M.Ordering2 = 4 then 'User Management' else '' End) as Label,(Case When M.Ordering2 = 1 then 'Main' When M.Ordering2 = 2 then 'Transaction' When M.Ordering2 = 3 then 'Report' When M.Ordering2 = 4 then 'User Management' else '' End) as SubmenuHdr,  0 ParentID,'' as [Link], '' as Icon, 0 as [Right1], 0 as [Right2], 0 as [Right3], 0 as [Right4], 0 as [Right5] From ESUserMaster A Inner join ESUserRights U On A.[Role] = U.[MasterCode1] Inner Join ESMenuMaster M On U.[MasterCode2] = M.[Code] Where A.[UID] = {UserId} And (IsNull(I1,0) = 1 Or IsNull(I2,0) = 1 Or IsNull(I3,0) = 1 Or IsNull(I4,0) = 1 Or IsNull(I5,0) = 1) Group by M.Ordering2 Order By M.Ordering2";
+            }
+            else if (TranType == 2)
+            {
+                sql = $"Select CAST(1 AS BIT) as SubmenuOpen, CAST(0 AS BIT) as showSubRoute, CAST(0 AS BIT) as submenu,IsNull(M1.[TranType],0) as TranType, M.[Ordering3] as PMenuOrd, M.[Ordering2] as SubMenuNo, M.[ParentId] as MenuId, IsNull(M1.Name,'') as Label, IsNull(M1.Name,'') as SubmenuHdr, 0 ParentID, '' as [Link], '' as Icon, 0 as [Right1], 0 as [Right2], 0 as [Right3], 0 as [Right4], 0 as [Right5] From ESUSERMASTER A INNER JOIN ESUSERRIGHTS U ON A.[ROLE] = U.[MASTERCODE1] INNER JOIN ESMENUMASTER M On U.[MASTERCODE2] = M.[CODE] LEFT JOIN ESMENUMASTER M1 On M.PARENTID = M1.[CODE] WHERE A.[UID] = {UserId} And M.[Ordering2] = {SubMenu} And (IsNull(I1,0) = 1 Or IsNull(I2,0) = 1 Or IsNull(I3,0) = 1 Or IsNull(I4,0) = 1 Or IsNull(I5,0) = 1) Group By M.[ORDERING3],M.[PARENTID],M1.[Name],M1.[TranType],M.[ORDERING2] Order By M.[ORDERING3]";
+            }
+            else if (TranType == 3)
+            {
+                sql = $"Select CAST(1 AS BIT) as SubmenuOpen, CAST(0 AS BIT) as showSubRoute, CAST(0 AS BIT) as submenu, IsNull(M.[TranType], 0) as TranType, M.[Ordering3] as PMenuOrd, M.[Ordering2] as SubMenuNo, U.[MasterCode2] as MenuId, IsNull(M.[Name], '') as Label, IsNull(M.[Name], '') as SubmenuHdr,M.ParentID, IsNull(M.[Path], '') as Link, IsNull(M.[MenuIcon], '') as Icon, IsNull(I1,0) as Right1, IsNull(I2,0) as Right2, IsNull(I3,0) as Right3, IsNull(I4,0) as Right4, IsNull(I5,0) as Right5 From ESUSERMASTER A INNER JOIN ESUSERRIGHTS U On A.[Role] = U.[MasterCode1] INNER JOIN ESMENUMASTER M ON U.MASTERCODE2 = M.CODE Where A.[UID] = {UserId} And M.[Ordering2] = {SubMenu} And M.[Ordering3] = {PMenuOrd} And M.[ParentId] = {ParentId} And (IsNull(I1,0) = 1 Or IsNull(I2,0) = 1 Or IsNull(I3,0) = 1 Or IsNull(I4,0) = 1 Or IsNull(I5,0) = 1) Order By M.[ORDERING3],M.[Ordering1]";
+            }
+            var DT1 = await _db.UserMenuss.FromSqlRaw(sql).ToListAsync();
+
+            UserMenus menu = new UserMenus();
+            foreach (var item in DT1)
+            {
+                if (TranType == 2 && item.MenuId > 0)
+                {
+                    menu = new UserMenus();
+                    menu.MenuId = item.MenuId;
+                    menu.Label = item.Label;
+                    menu.Link = item.Link;
+                    menu.Icon = DiamondHelper.StringManipulatorExtractFirstTag(item.Icon);
+                    menu.SubmenuOpen = item.TranType == 1 ? false: item.SubmenuOpen;
+                    menu.ShowSubRoute = item.ShowSubRoute;
+                    menu.Submenu = item.TranType == 1 ? true : item.Submenu;
+                    menu.SubmenuHdr = item.SubmenuHdr;
+                    menu.ParentId = item.ParentId;
+                    menu.PMenuOrd = item.PMenuOrd;
+                    menu.SubMenuNo = item.SubMenuNo;
+                    menu.TranType = item.TranType;
+                    menu.SubmenuItems = await GetSubUserMenu(UserId, item.SubMenuNo, item.MenuId, item.PMenuOrd, TranType + 1);
+                    Menus.Add(menu);
+                }
+                else
+                {
+                    if (TranType == 1 || TranType == 3)
+                    {
+                        menu = new UserMenus();
+                        menu.MenuId = item.MenuId;
+                        menu.Label = item.Label;
+                        menu.Link = item.Link;
+                        menu.Icon = DiamondHelper.StringManipulatorExtractFirstTag(item.Icon);
+                        menu.SubmenuOpen = item.TranType == 1 ? false : item.SubmenuOpen;
+                        menu.ShowSubRoute = item.ShowSubRoute;
+                        menu.Submenu = item.TranType == 1 ? true : item.Submenu;
+                        menu.SubmenuHdr = item.SubmenuHdr;
+                        menu.ParentId = item.ParentId;
+                        menu.PMenuOrd = item.PMenuOrd;
+                        menu.SubMenuNo = item.SubMenuNo;
+                        menu.TranType = item.TranType;
+                        menu.SubmenuItems = new List<UserMenus>();
+                        if (TranType != 3) menu.SubmenuItems = await GetSubUserMenu(UserId, item.SubMenuNo, item.ParentId, item.PMenuOrd, TranType + 1);
+                        Menus.Add(menu);
+                    }
+                    else
+                    {
+                        List<UserMenus> SubM = await GetSubUserMenu(UserId, item.SubMenuNo, 0, item.PMenuOrd, TranType + 1);
+                        foreach (var U in SubM) { Menus.Add(U); }
+                    }
+                }
+            }
+            return Menus;
+        }
     }
+
 }
